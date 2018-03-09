@@ -5,10 +5,11 @@ using UnityEngine.Networking;
 using RestSharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Text;
 
 public class SpeechRecognizer : MonoBehaviour {
 
-    public string apiKey = "";
+    public string apiKey;
     public TextAsset base64Audio;
 
 	// Use this for initialization
@@ -33,12 +34,14 @@ public class SpeechRecognizer : MonoBehaviour {
             ))
         );
 
-        Debug.Log(speechRequest.ToString());
+        var content = speechRequest.ToString();
+        Debug.Log(apiKey);
+        Debug.Log(content);
 
         var client = new RestClient("https://speech.googleapis.com/");
         var req = new RestRequest("v1/speech:recognize", Method.POST);
-        req.AddParameter("key", apiKey);
-        req.AddBody(speechRequest.ToString());
+        req.AddParameter("key", apiKey, ParameterType.QueryString);
+        req.AddParameter("application/json", Encoding.UTF8.GetBytes(content), ParameterType.RequestBody);
 
         var resp = client.Execute(req);
         Debug.Log(resp.ErrorMessage);

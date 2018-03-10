@@ -1,8 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
+
+[System.Serializable]
+public class MetamindResponseEvent : UnityEvent<Message> { }
+
 
 public class MetamindClient : MonoBehaviour {
+
+  [SerializeField]
+  public MetamindResponseEvent onMetamindResponse;
 
   public string basePath;
 	public string username;
@@ -13,8 +21,6 @@ public class MetamindClient : MonoBehaviour {
   public string visitor;
 
   private string sessionId = null;
-
-  private List<System.Action<Message>> onMessageListeners;
 
   private WWW doPost(string path, string json) {
     string URL = basePath + path;
@@ -43,9 +49,7 @@ public class MetamindClient : MonoBehaviour {
     yield return res;
     if (res.error == null) {
       Message createdMessage = JsonUtility.FromJson<Message>(res.text);
-      onMessageListeners.ForEach((System.Action<Message> listener) => { 
-        listener.Invoke(createdMessage); 
-      });
+      onMetamindResponse.Invoke(createdMessage);
     } else {
       Debug.Log(res.error);
     }
@@ -72,11 +76,6 @@ public class MetamindClient : MonoBehaviour {
   }
 
 	public void Start () {
-    onMessageListeners = new List<System.Action<Message>>();
     createSession();
 	}
-
-  public void OnMetamindMessage(System.Action<Message> listener) {
-    onMessageListeners.Add(listener);
-  }
 }

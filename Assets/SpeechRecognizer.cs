@@ -75,14 +75,22 @@ public class SpeechRecognizer : MonoBehaviour {
         SavWav.ConvertAndWrite(stream, trimmed);
         SavWav.WriteHeader(stream, trimmed);
         var bytes = stream.ToArray();
-        var result = DecodeSpeech(bytes);
-        Debug.Log(result);
-        onSpeechRecognized.Invoke(result);
-
+        StartCoroutine(DecodeSpeech(bytes));
         clip = null;
     }
 
-    private string DecodeSpeech(byte[] wavSpeech)
+    private WWW doPost(string path, string json)
+    {
+        string URL = path + "?key=" + apiKeyFile.text;
+
+        Dictionary<string, string> headers = new Dictionary<string, string>();
+        headers.Add("Content-Type", "application/json");
+        byte[] postData = System.Text.Encoding.UTF8.GetBytes(json);
+
+        return new WWW(URL, postData, headers);
+    }
+
+    private IEnumerator DecodeSpeech(byte[] wavSpeech)
     {
         var speechRequest = new JObject(
             new JProperty("audio", new JObject(
@@ -95,23 +103,17 @@ public class SpeechRecognizer : MonoBehaviour {
 
         var content = speechRequest.ToString();
 
-        var client = new RestClient("https://speech.googleapis.com/");
-        var req = new RestRequest("v1/speech:recognize", Method.POST);
-        req.AddParameter("key", apiKeyFile.text, ParameterType.QueryString);
-        req.AddParameter("application/json", Encoding.UTF8.GetBytes(content), ParameterType.RequestBody);
-
-        var resp = client.Execute(req);
-        Debug.Log(resp.ErrorMessage);
-        Debug.Log(resp.ResponseStatus);
-        Debug.Log(resp.Content);
-
-        var speechResponse = JObject.Parse(resp.Content);
-        var results = (JArray)speechResponse["results"];
-        if (results != null && results.Count > 0)
+        using (WWW www = doPost("https://speech.googleapis.com/v1/speech:recognize", content))
         {
-            return (string)results[0]["alternatives"][0]["transcript"];
-        }
+            yield return www;
 
-        return "";
+            var speechResponse = JObject.Parse(www.text);
+            var results = (JArray)speechResponse["results"];
+            if (results != null && results.Count > 0)
+            {
+                string val = (string)results[0]["alternatives"][0]["transcript"];
+                onSpeechRecognized.Invoke(val);
+            }
+        }
     }
 }

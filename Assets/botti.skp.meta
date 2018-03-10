@@ -8,16 +8,16 @@ SketchUpImporter:
   selectedNodes: 0000000001000000
   assetHash:
     serializedVersion: 2
-    Hash: 81352cc61d9eb095326ddb960215ce41
+    Hash: af55d9eb5108d8e4a77ba47eed01c351
   longitude: -105.242139
   latitude: 40.018309
   northCorrection: -0
   fileUnit: 0
   sketchUpImportData:
     defaultCamera:
-      position: {x: -0.036325186, y: 0.062219124, z: -0.079051584}
-      lookAt: {x: -0.023181442, y: 0.04447715, z: -0.04436863}
-      up: {x: 0.15292001, y: 0.90210307, z: 0.4035165}
+      position: {x: 0.013045214, y: 0.069694564, z: -0.1061871}
+      lookAt: {x: 0.0044323793, y: 0.046195686, z: -0.052718874}
+      up: {x: -0.06330227, y: 0.9173662, z: 0.39297858}
       fov: 35
       aspectRatio: 0
       orthoSize: 1
@@ -35,6 +35,11 @@ SketchUpImporter:
     2100010: '[Metal Steel Textured White]'
     2100012: '[Water Sparkling]'
     2100014: '[Carpet Plush Charcoal]'
+    2100016: '[Color M02]'
+    2100018: '[Color M07]'
+    2100020: '[Color I01]'
+    2100022: '[Color M03]'
+    2100024: '[Color E05]'
     2300000: //RootNode
     3300000: //RootNode
     4300000: Mesh Simple Template - Millimeters

@@ -19,7 +19,7 @@ public class SpeechRecognizedEvent : UnityEvent<String>
 
 public class SpeechRecognizer : MonoBehaviour {
 
-    public string apiKey;
+    public TextAsset apiKeyFile;
     public int recordLength;
     [SerializeField]
     public SpeechRecognizedEvent onSpeechRecognized;
@@ -40,11 +40,6 @@ public class SpeechRecognizer : MonoBehaviour {
                 maxFreq = 44100;
             }
         }
-    }
-    
-    // Update is called once per frame
-    void Update()
-    {
     }
 
     public void Record()
@@ -102,7 +97,7 @@ public class SpeechRecognizer : MonoBehaviour {
 
         var client = new RestClient("https://speech.googleapis.com/");
         var req = new RestRequest("v1/speech:recognize", Method.POST);
-        req.AddParameter("key", apiKey, ParameterType.QueryString);
+        req.AddParameter("key", apiKeyFile.text, ParameterType.QueryString);
         req.AddParameter("application/json", Encoding.UTF8.GetBytes(content), ParameterType.RequestBody);
 
         var resp = client.Execute(req);

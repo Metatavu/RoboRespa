@@ -19,8 +19,7 @@ public class MetamindClient : MonoBehaviour
     public MetamindStringResponseEvent onMetamindStringResponse;
 
     public string basePath;
-    public string username;
-    public string password;
+    public TextAsset credentialsFile;
     public string story;
     public string timeZone;
     public string locale;
@@ -36,7 +35,8 @@ public class MetamindClient : MonoBehaviour
         string accessToken;
 
         Dictionary<string, string> headers = new Dictionary<string, string>();
-        accessToken = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(username + ":" + password));
+        string credentials = credentialsFile.text.Replace("\n", "").Replace("\r", "");
+        accessToken = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(credentials));
         headers.Add("Authorization", "Basic " + accessToken);
         headers.Add("Content-Type", "application/json");
         byte[] postData = System.Text.Encoding.UTF8.GetBytes(json);

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using System.IO;
 using NAudio;
 using NAudio.Wave;
@@ -8,9 +9,16 @@ using NAudio.Wave.SampleProviders;
 using MediaToolkit;
 using MediaToolkit.Model;
 
+[System.Serializable]
+public class ResponsiveVoiceSpeechStartEvent : UnityEvent
+{
+
+}
+
 public class ResponsiveVoiceSynthesizer : MonoBehaviour
 {
     public AudioSource audioSource;
+    public ResponsiveVoiceSpeechStartEvent onSpeechStart;
     private bool finished = false;
 
     // Use this for initialization
@@ -36,31 +44,43 @@ public class ResponsiveVoiceSynthesizer : MonoBehaviour
 
             Debug.Log("Gotten response from responsivevoice: " + response.error);
 
-            string mp3Path = @"C:\Users\Ilmo Euro\Desktop\foobar\foobar.mp3";
+            string fileName = "clip" + Random.Range(0, 100000);
+            string basePath = Path.Combine(Application.persistentDataPath, "responsiveClips");
+            string filePath = Path.Combine(basePath, fileName);
+            string mp3Path = filePath + ".mp3";
+            string wavPath = filePath + ".wav";
 
-            Directory.CreateDirectory(Path.GetDirectoryName(mp3Path));
-            File.WriteAllBytes(mp3Path, response.bytes);
+            try {
+                Directory.CreateDirectory(Path.GetDirectoryName(mp3Path));
+                File.WriteAllBytes(mp3Path, response.bytes);
 
-            string wavPath = @"C:\Users\Ilmo Euro\Desktop\foobar\foobar.wav";
 
-            var mp3File = new MediaFile { Filename = mp3Path };
-            var wavFile = new MediaFile { Filename = wavPath };
+                var mp3File = new MediaFile { Filename = mp3Path };
+                var wavFile = new MediaFile { Filename = wavPath };
 
-            using (var engine = new Engine())
+                using (var engine = new Engine())
+                {
+                    finished = false;
+                    engine.Convert(mp3File, wavFile);
+                }
+
+                yield return new WaitForSeconds(2f);
+
+                using (WWW clipWww = new WWW("file:///" + wavPath))
+                {
+                    yield return clipWww;
+
+                    onSpeechStart.Invoke();
+                    Debug.Log("Playing clip");
+                    var clip = clipWww.GetAudioClip();
+
+                    audioSource.clip = clip;
+                    audioSource.Play();
+                }
+            } finally
             {
-                finished = false;
-                engine.Convert(mp3File, wavFile);
-            }
-
-            yield return new WaitForSeconds(2f);
-
-            using (WWW clipWww = new WWW("file:///" + wavPath))
-            {
-                Debug.Log("Playing clip");
-                var clip = clipWww.GetAudioClip();
-
-                audioSource.clip = clip;
-                audioSource.Play();
+                File.Delete(mp3Path);
+                File.Delete(wavPath);
             }
         }
     }

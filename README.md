@@ -10,3 +10,6 @@ The text is then processed by smart chatbot API called [Metamind](https://github
 Metamind uses natural language processing AI to recognize user intent and progresses thru narrative that is defined using [Ink- script](https://www.inklestudios.com/ink/).
 
 ![Communication diagram](https://github.com/Metatavu/RoboRespa/blob/master/RoboRespa.png?raw=true "")
+
+
+[Demo Video](https://youtu.be/ge222ycS2TU)
